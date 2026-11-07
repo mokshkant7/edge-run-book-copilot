@@ -1,0 +1,39 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "edge-runbook-copilot",
+  "main": "src/server.ts",
+  "compatibility_date": "2026-11-05",
+  "compatibility_flags": ["nodejs_compat"],
+  // The Agents SDK routes workflow callbacks by class name; keep names through bundling.
+  "keep_names": true,
+  "observability": { "enabled": true },
+  "ai": { "binding": "AI" },
+  "durable_objects": {
+    "bindings": [
+      { "name": "ChatAgent", "class_name": "ChatAgent" },
+      { "name": "QuotaGate", "class_name": "QuotaGate" }
+    ]
+  },
+  "workflows": [
+    {
+      "name": "edge-runbook-diagnosis",
+      "binding": "DIAGNOSIS_WORKFLOW",
+      "class_name": "DiagnosisWorkflow"
+    }
+  ],
+  // Free plan requires SQLite-backed Durable Objects (new_sqlite_classes).
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ChatAgent", "QuotaGate"] }],
+  "vars": {
+    "CHAT_MODEL": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    // "workers-ai" or "offline" (runbook-only answers, no model calls).
+    "LLM_MODE": "workers-ai",
+    // Free-tier guard rails: Workers AI calls allowed per UTC day (all visitors / per visitor).
+    "DAILY_AI_CALL_LIMIT": "60",
+    "DAILY_PER_CLIENT_LIMIT": "15"
+  },
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  }
+}

@@ -1,0 +1,5 @@
+# No secrets are required: Workers AI is used through a binding, not an API key.
+# Copy to .dev.vars only to override non-secret settings locally, for example:
+# LLM_MODE=offline
+# DAILY_AI_CALL_LIMIT=60
+# DAILY_PER_CLIENT_LIMIT=15
